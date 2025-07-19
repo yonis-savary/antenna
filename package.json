@@ -1,0 +1,38 @@
+{
+  "name": "@yonis-savary/antenna",
+  "version": "1.0.0",
+  "description": "Simple NodeJs Webhooks Server",
+  "main": "antenna.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yonis-savary/antenna.git"
+  },
+  "keywords": [
+    "node",
+    "webhooks",
+    "server"
+  ],
+  "author": "yonis-savary",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yonis-savary/antenna/issues"
+  },
+  "homepage": "https://github.com/yonis-savary/antenna#readme",
+  "devDependencies": {
+    "@types/node": "^24.0.15",
+    "@types/yaml": "^1.9.7",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "tsup": "^8.5.0",
+    "yaml": "^2.8.0",
+    "zod": "^4.0.5"
+  }
+}
