@@ -6,7 +6,8 @@ export const ServiceSchema = z.object({
     directory: z.string(),
     commands: z.array(z.string()),
     delay: z.number().optional().default(0),
-    secret: z.string().optional()
+    secret: z.string().optional(),
+    secret_header: z.string().optional()
 });
 
 export const ConfigSchema = z.record(z.string(), ServiceSchema);

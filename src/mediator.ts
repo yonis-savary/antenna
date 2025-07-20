@@ -33,17 +33,19 @@ export default class Mediator {
             processLogger.log(`> ${command}`);
             await new Promise((resolve, reject) => {
                 exec(command, { cwd: service.directory }, (error, stdout, stderr) => {
-                    if (error) {
-                        processLogger.error(`Execution error: ${error.message}`);
-                    }
                     if (stderr) {
-                        processLogger.error(`stderr: ${stderr}`);
+                        stderr.trim().split("\n").forEach(line => processLogger.error(`stderr: ${line}`));
                     }
                     if (stdout) {
-                        processLogger.log(`stdout: ${stdout}`);
+                        stdout.trim().split("\n").forEach(line => processLogger.log(`stdout: ${line}`));
                     }
                     if (!(error || stderr || stdout)) {
                         processLogger.log(`No output`);
+                    }
+
+                    if (error) {
+                        error.message.trim().split("\n").forEach(line => processLogger.log(`error: ${line}`));
+                        return reject(error.message);
                     }
 
                     resolve(stdout)
@@ -52,15 +54,17 @@ export default class Mediator {
         }
     }
 
-    schedule(serviceName: string, service: ServiceConfig) {
+    async schedule(serviceName: string, service: ServiceConfig): Promise<true|null> {
         if (serviceName in this.timeouts) {
             this.logger.log("Ignoring schedule for " + serviceName + " (timeout already existing)")
-            return;
+            return null;
         }
 
         if (!service.delay) {
-            this.logger.log("Executing directly " + serviceName);
-            this.launch(serviceName, service)
+            this.logger.log("Executing " + serviceName + " (no delay)");
+            await this.launch(serviceName, service)
+                .catch(error => {throw new Error(error)})
+            return true;
         }
         else {
             this.timeouts[serviceName] = {
@@ -71,7 +75,8 @@ export default class Mediator {
                 name: serviceName,
                 service
             }
-            this.logger.log("Setting timeout for " + serviceName)
+            this.logger.log("Executing " + serviceName + ` (delayed by ${service.delay} seconds)`);
+            return null;
         }
     }
 }

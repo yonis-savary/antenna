@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsup",
     "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tsx node_modules/uvu/bin.js test"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,9 @@
   "devDependencies": {
     "@types/node": "^24.0.15",
     "@types/yaml": "^1.9.7",
-    "typescript": "^5.8.3"
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "uvu": "^0.5.6"
   },
   "dependencies": {
     "dotenv": "^17.2.0",

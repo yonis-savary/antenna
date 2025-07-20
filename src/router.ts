@@ -36,11 +36,10 @@ export default class Router {
     }
 
     async route(request: RouterRequest, response: ServerResponse<IncomingMessage>) {
-
         request.body = await getRequestBody(request);
 
-        if (!await hasJsonBody(request, response))
-            return;
+        this.logger.log(`${request.method} ${request.url}`)
+
 
         const service = this.routes[request.url ?? ''];
 
@@ -50,13 +49,44 @@ export default class Router {
             return;
         }
 
-        if (!await sha256ChecksOut(request, response, service.service)) 
-            return;
 
-        this.mediator.schedule(service.name, service.service);
+        if (service.service.secret)
+        {
+            if (!await hasJsonBody(request, response)) {
+                response.writeHead(415);
+                response.end();
+                return;
+            }
+    
+            if (!await sha256ChecksOut(request, response, service.name, service.service)) {
+                response.setHeader('content-type', 'application/json');
+                response.writeHead(401);
+                response.write(JSON.stringify({status: 'error', message: 'invalid/missing signature'}))
+                response.end();
+                return;
+            }
+        }
 
-        response.setHeader('Content-Type', 'application/json');
-        response.writeHead(204);
-        response.end();
+        try {
+            const result = await this.mediator.schedule(service.name, service.service);
+            if (result) {
+                response.setHeader('content-type', 'application/json');
+                response.writeHead(200);
+                response.write(JSON.stringify({status: 'ok', message: 'task successfuly executed'}))
+                response.end();
+            } else {
+                response.setHeader('content-type', 'application/json');
+                response.writeHead(200);
+                response.write(JSON.stringify({status: 'ok', message: 'task scheduled (or already scheduled)'}))
+                response.end();
+            }
+        }
+        catch (error) {
+            response.setHeader('content-type', 'application/json');
+            response.writeHead(500);
+            response.write(JSON.stringify({status: 'error', message: error}))
+            response.end();
+        }
+
     }
 }
