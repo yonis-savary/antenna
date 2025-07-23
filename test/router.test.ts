@@ -8,25 +8,44 @@ const test = suite('HTTP Router');
 
 const currentWorkingDirectory = process.cwd();
 
+type InjectionType = "none" | "pipe" | "variable"
+
+const baseOptions = {
+    directory: currentWorkingDirectory,
+    injection: 'none' as InjectionType,
+    injection_variable: 'ANTENNA_BODY',
+    delay: 0
+};
+
 const router = new Router({
     'my-repo-webhook': {
+        ...baseOptions,
         url: '/first-project',
-        commands: [ 'echo \"Hello\"' ],
-        directory: currentWorkingDirectory,
-        delay: 0
+        commands: [ 'echo \"Hello\"' ]
     },
     'full-of-errors': {
+        ...baseOptions,
         url: '/error-maker',
-        commands: [ 'some-inexistent-command' ],
-        directory: currentWorkingDirectory,
-        delay: 0
+        commands: [ 'some-inexistent-command' ]
     },
     'secured-webhook': {
+        ...baseOptions,
         url: '/secured-project',
         commands: [ 'echo \"Hello\"' ],
-        secret: 'mysupersecret',
-        directory: currentWorkingDirectory,
-        delay: 0
+        secret: 'mysupersecret'
+    },
+    'webhook-that-prints': {
+        ...baseOptions,
+        url: '/print-body',
+        commands: ['cat'],
+        injection: 'pipe'
+    },
+    'webhook-that-prints-variable': {
+        ...baseOptions,
+        url: '/print-body/variable',
+        commands: ['echo "$MY_VARIABLE"'],
+        injection: 'variable',
+        injection_variable: 'MY_VARIABLE'
     }
 })
 
@@ -126,7 +145,6 @@ test('should respond 200 on valid sha256 signature', async () => {
 });
 
 test('should play ping-pong', async () => {
-    const body = JSON.stringify({message: 'hello-there!'});
     const req = createMockReq({
         method: 'GET',
         url: '/ping'
@@ -138,6 +156,57 @@ test('should play ping-pong', async () => {
     assert.is(res._data, 'pong');
 });
 
+
+test('should return command stdout', async () => {
+    const body = JSON.stringify(123);
+    const req = createMockReq({
+        method: 'POST',
+        url: '/print-body',
+        headers: {
+            "content-type": 'application/json'
+        },
+        body: body
+    });
+    const res = createMockRes();
+    await router.route(req, res);
+
+    assert.is(res._headers['content-type'], 'application/json')
+    assert.is(res._statusCode, 200);
+    assert.is(res._data, JSON.stringify({
+        status: 'ok',
+        message: 'task successfuly executed',
+        data: [{
+            command: 'cat',
+            output: '123\n'
+        }]
+    }))
+});
+
+
+test('should return command stdout (variable)', async () => {
+    const body = JSON.stringify(123);
+    const req = createMockReq({
+        method: 'POST',
+        url: '/print-body/variable',
+        headers: {
+            "content-type": 'application/json'
+        },
+        body: body
+    });
+    const res = createMockRes();
+    await router.route(req, res);
+
+    assert.is(res._headers['content-type'], 'application/json')
+    assert.is(res._statusCode, 200);
+    assert.is(res._data, JSON.stringify({
+        status: 'ok',
+        message: 'task successfuly executed',
+        data: [{
+            command: 'echo \"$MY_VARIABLE\"',
+            output: '123\n'
+        }]
+    }))
+});
 
 
 
