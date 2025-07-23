@@ -14,7 +14,7 @@ Basic NodeJs Webhooks server
 CONFIG_FILE=/home/foo/antenna.yml
 APP_PORT=3000
 
-# If set to true, will allow the definition of a /ping 
+# If set to true, will allow the definition of a /ping
 # route that can be used to check the service status
 ALLOW_PING_ROUTE=true # (true by default)
 ```
@@ -27,9 +27,9 @@ my-service:
   # Shell commands to execute
   commands:
     - "echo 'Hello!' >> output"
-  # Directory to use for commands
+  # Working directory for commands
   directory: "/home/foo/my-project"
-  #Cooldown between executions (seconds, optionnal, 0 by default)
+  # Debounce delay (seconds, optionnal, 0 by default)
   delay: 10
   # SHA256 Secret (optionnal)
   secret: 'supersecret'
@@ -40,7 +40,7 @@ webhook-that-prints:
   url: '/print-body'
   directory: "/home/foo/my-project"
   # Request body can also be given to your commands
-  # injection: pipe executes echo <body> | <your-command>
+  # "injection: pipe" executes echo <body> | <your-command>
   injection: 'pipe'
   commands:
    - 'cat',
@@ -48,9 +48,9 @@ webhook-that-prints:
 webhook-that-prints-variable:
   url: '/print-body/variable'
   directory: "/home/foo/my-project"
-  # If your command does not support stdin (or incompatible with)
+  # If your command does not support stdin
   # You can pass the request through a variable
-  # injection: variable executes MY_VARIABLE=<body>; <your-command>
+  # "injection: variable" executes MY_VARIABLE=<body>; <your-command>
   injection: variable
   injection_variable: MY_VARIABLE
   commands:
