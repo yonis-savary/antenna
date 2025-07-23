@@ -78,11 +78,11 @@ export default class Router {
         }
 
         try {
-            const result = await this.mediator.schedule(service.name, service.service);
+            const result = await this.mediator.schedule(service.name, service.service, request.body);
             if (result) {
                 response.setHeader('content-type', 'application/json');
                 response.writeHead(200);
-                response.write(JSON.stringify({status: 'ok', message: 'task successfuly executed'}))
+                response.write(JSON.stringify({status: 'ok', message: 'task successfuly executed', data: result}))
                 response.end();
             } else {
                 response.setHeader('content-type', 'application/json');
