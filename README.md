@@ -42,6 +42,10 @@ webhook-that-prints:
   # Request body can also be given to your commands
   # "injection: pipe" executes echo <body> | <your-command>
   injection: 'pipe'
+  # Async simply launch the command and return a 200 response with no body 
+  # Note: any delay on a webhook makes it async
+  # (async is false by default)
+  async: true
   commands:
    - 'cat',
 

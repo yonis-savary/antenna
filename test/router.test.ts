@@ -14,6 +14,7 @@ const baseOptions = {
     directory: currentWorkingDirectory,
     injection: 'none' as InjectionType,
     injection_variable: 'ANTENNA_BODY',
+    async: false,
     delay: 0
 };
 
@@ -46,7 +47,13 @@ const router = new Router({
         commands: ['echo "$MY_VARIABLE"'],
         injection: 'variable',
         injection_variable: 'MY_VARIABLE'
-    }
+    },
+    'my-async-webhook': {
+        ...baseOptions,
+        async: true,
+        url: '/async-webhook',
+        commands: [ 'sleep 1 && echo \"Hello\"' ]
+    },
 })
 
 test('should respond 404 on unregistered service', async () => {
@@ -206,6 +213,16 @@ test('should return command stdout (variable)', async () => {
             output: '123\n'
         }]
     }))
+});
+
+
+test('should respond 200 on executed async service', async () => {
+    const req = createMockReq({ method: 'POST', url: '/async-webhook', headers: { "content-type": 'application/json' }, body: "null" });
+    const res = createMockRes();
+    await router.route(req, res);
+
+    assert.is(res._headers['content-type'], 'application/json')
+    assert.is(res._statusCode, 200);
 });
 
 

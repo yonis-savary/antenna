@@ -78,6 +78,13 @@ export default class Mediator {
         }
 
         if (!service.delay) {
+            if (service.async) {
+                this.logger.log("Executing " + serviceName + " (async)");
+                this.launch(serviceName, service, body)
+                    .catch(error => {throw new Error(error)})
+                return [];
+            }
+            
             this.logger.log("Executing " + serviceName + " (no delay)");
             return await this.launch(serviceName, service, body)
                 .catch(error => {throw new Error(error)})

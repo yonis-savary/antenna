@@ -6,6 +6,7 @@ export const ServiceSchema = z.object({
     directory: z.string(),
     injection: z.enum(['none', 'pipe', 'variable']).optional().default('none'),
     injection_variable: z.string().optional().default('ANTENNA_BODY'),
+    async: z.boolean().optional().default(false),
     commands: z.array(z.string()),
     delay: z.number().optional().default(0),
     secret: z.string().optional(),
