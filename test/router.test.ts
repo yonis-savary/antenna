@@ -125,6 +125,19 @@ test('should respond 200 on valid sha256 signature', async () => {
     assert.is(res._statusCode, 200);
 });
 
+test('should play ping-pong', async () => {
+    const body = JSON.stringify({message: 'hello-there!'});
+    const req = createMockReq({
+        method: 'GET',
+        url: '/ping'
+    });
+    const res = createMockRes();
+    await router.route(req, res);
+
+    assert.is(res._statusCode, 200);
+    assert.is(res._data, 'pong');
+});
+
 
 
 
