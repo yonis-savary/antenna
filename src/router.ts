@@ -104,8 +104,6 @@ export default class Router {
     async route(request: RouterRequest, response: ServerResponse<IncomingMessage>) {
         request.body = await getRequestBody(request);
 
-        this.logger.log(`${request.method} ${request.url}`)
-
         const service = this.routes[request.url ?? ''];
 
         if (!service) {
