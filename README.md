@@ -2,14 +2,33 @@
 
 Basic NodeJs Webhooks server
 
-# Features
+## Features
 
 - Configurable routes / commands
 - SHA256 Secret support
 
-## Example configuration
+## Installation
 
-`.env`
+```sh
+git clone https://github.com/yonis-savary/antenna.git
+cd antenna
+
+# direct launch
+make up
+
+# build only
+make build
+
+# start with pm2
+make prod
+```
+
+## Configuration example
+
+### Application Configuration
+
+`.env` :
+
 ```conf
 CONFIG_FILE=/home/foo/antenna.yml
 APP_PORT=3000
@@ -19,7 +38,10 @@ APP_PORT=3000
 ALLOW_PING_ROUTE=true # (true by default)
 ```
 
+### Service configuration
+
 `antenna.yml` :
+
 ```yml
 my-service:
   # URL to launch the webhook
@@ -33,8 +55,6 @@ my-service:
   delay: 10
   # SHA256 Secret (optionnal)
   secret: 'supersecret'
-
-
 
 webhook-that-prints:
   url: '/print-body'
@@ -67,20 +87,4 @@ curl -vX POST http://localhost:3000/my-service \
   -H "Content-Type: application/json" \
   -H "x-hub-signature-256: sha256=ca2a85992c486d33a9b753013138edbd3d885c083d43790f0f83405a7af707b4" \
   -d '{"message":"Hello from curl!"}'
-```
-
-# Installation
-
-```sh
-git clone https://github.com/yonis-savary/antenna.git
-cd antenna
-
-# direct launch
-make up
-
-# build only
-make build
-
-# start with pm2
-make prod
 ```
