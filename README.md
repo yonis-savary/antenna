@@ -75,11 +75,12 @@ curl -vX POST http://localhost:3000/my-service \
 git clone https://github.com/yonis-savary/antenna.git
 cd antenna
 
-# Manually building it
-npm i && \
-    npm run build && \
-    node dist/antenna.cjs
+# direct launch
+make up
 
-# with pm2
+# build only
+make build
+
+# start with pm2
 make prod
 ```
