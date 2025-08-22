@@ -1,7 +1,7 @@
-import { exec } from "child_process";
 import { ServiceConfig } from "./types/config-types";
 import Logger from "./logger";
 import CommandOutput from "./types/command-output";
+import Process from "./process";
 
 type MediatorService = { timeout: Timeout, name: string, service: ServiceConfig };
 type Timeout = ReturnType<typeof setTimeout>;
@@ -27,48 +27,8 @@ export default class Mediator {
     }
 
     private async launch(serviceName: string, service: ServiceConfig, body: string): Promise<CommandOutput[]> {
-        let processLogger = new Logger(serviceName);
-
-        let outputs: CommandOutput[] = [];
-        processLogger.log(`Launching service ${serviceName}`)
-        for (const command of service.commands) {
-
-            const escapedBody = body.replace(/"/g, '\\"');
-            let commandToLaunch = command
-
-            if (service.injection == 'pipe')
-                commandToLaunch = `echo \"${escapedBody}\" | ${command}`
-
-            if (service.injection == 'variable')
-                commandToLaunch = `${service.injection_variable}="${escapedBody}"; ${command}`
-
-            processLogger.log(`> ${commandToLaunch}`);
-
-            const output = await new Promise((resolve, reject) => {
-                exec(commandToLaunch, { cwd: service.directory }, (error, stdout, stderr) => {
-                    if (stderr) {
-                        stderr.trim().split("\n").forEach(line => processLogger.error(`stderr: ${line}`));
-                    }
-                    if (stdout) {
-                        stdout.trim().split("\n").forEach(line => processLogger.log(`stdout: ${line}`));
-                    }
-                    if (!(error || stderr || stdout)) {
-                        processLogger.log(`No output`);
-                    }
-
-                    if (error) {
-                        error.message.trim().split("\n").forEach(line => processLogger.log(`error: ${line}`));
-                        return reject(error.message);
-                    }
-
-                    resolve(stdout)
-                })
-            }) as string;
-
-            outputs.push({command, output})
-        }
-
-        return outputs
+        const process = new Process(serviceName, service, body);
+        return await process.launch();
     }
 
     async schedule(serviceName: string, service: ServiceConfig, body: string): Promise<CommandOutput[]> {

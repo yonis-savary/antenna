@@ -3,17 +3,33 @@ import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import { calculateSha256Digest, createMockReq, createMockRes } from './utils';
 import Router from '../src/router';
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import { existsSync } from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const scriptDirectory = join(__dirname, 'hooks');
+
+const scriptCommand = (runtime:string, scriptName: string) => {
+    const expectedFile = join(scriptDirectory, scriptName);
+    if (!existsSync(expectedFile))
+        throw new Error('Could not resolve script ' + scriptName);
+
+    return runtime + ' ' + expectedFile
+}
 
 const test = suite('HTTP Router');
 
 const currentWorkingDirectory = process.cwd();
 
-type InjectionType = "none" | "pipe" | "variable"
+type InjectionType = "none" | "pipe" | "variable" | "argv";
 
 const baseOptions = {
     directory: currentWorkingDirectory,
     injection: 'none' as InjectionType,
     injection_variable: 'ANTENNA_BODY',
+    show_output: false,
     async: false,
     delay: 0
 };
@@ -38,12 +54,14 @@ const router = new Router({
     'webhook-that-prints': {
         ...baseOptions,
         url: '/print-body',
+        show_output: true,
         commands: ['cat'],
         injection: 'pipe'
     },
     'webhook-that-prints-variable': {
         ...baseOptions,
         url: '/print-body/variable',
+        show_output: true,
         commands: ['echo "$MY_VARIABLE"'],
         injection: 'variable',
         injection_variable: 'MY_VARIABLE'
@@ -53,6 +71,23 @@ const router = new Router({
         async: true,
         url: '/async-webhook',
         commands: [ 'sleep 1 && echo \"Hello\"' ]
+    },
+    'my-python-webhook': {
+        ...baseOptions,
+        url: '/python-webhook',
+        injection: 'argv' as InjectionType,
+        injection_variable: 'body',
+        show_output: true,
+        commands: [ scriptCommand('python3', 'python_test_json.py') ]
+    },
+    'my-contextualized-python-webhook': {
+        ...baseOptions,
+        directory: scriptDirectory,
+        url: '/python-webhook-with-directory',
+        injection: 'argv' as InjectionType,
+        injection_variable: 'body',
+        show_output: true,
+        commands: [ "python3 python_test_json.py" ]
     },
 })
 
@@ -218,6 +253,39 @@ test('should return command stdout (variable)', async () => {
 
 test('should respond 200 on executed async service', async () => {
     const req = createMockReq({ method: 'POST', url: '/async-webhook', headers: { "content-type": 'application/json' }, body: "null" });
+    const res = createMockRes();
+    await router.route(req, res);
+
+    assert.is(res._headers['content-type'], 'application/json')
+    assert.is(res._statusCode, 200);
+});
+
+
+
+test('should respond 200 on executed Python script', async () => {
+    const req = createMockReq({ method: 'POST', url: '/python-webhook', headers: { "content-type": 'application/json' }, body: JSON.stringify({
+        'message': 'Hello'
+    }) });
+    const res = createMockRes();
+    await router.route(req, res);
+
+    assert.is(res._headers['content-type'], 'application/json')
+    assert.is(res._statusCode, 200);
+
+    const data = JSON.parse(res._data) as {
+        status: 'ok' | 'error',
+        message: string,
+        data: any
+    }
+    assert.is(data.data.length, 1);
+    assert.is(data.data[0].output, 'Hello World !\n');
+});
+
+
+test('should respond 200 on executed contextualized Python script', async () => {
+    const req = createMockReq({ method: 'POST', url: '/python-webhook-with-directory', headers: { "content-type": 'application/json' }, body: JSON.stringify({
+        'message': 'Hello'
+    }) });
     const res = createMockRes();
     await router.route(req, res);
 
