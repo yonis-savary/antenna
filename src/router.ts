@@ -92,10 +92,13 @@ export default class Router {
             }
         }
         catch (error) {
-            console.error("Server Error :" + error);
+            const logger = new Logger('server-error')
+            logger.error('Got server error ' + error);
+            logger.error(JSON.stringify({status: 'error', message: String(error)}))
+
             response.setHeader('content-type', 'application/json');
             response.writeHead(500);
-            response.write(JSON.stringify({status: 'error', message: error}))
+            response.write(JSON.stringify({status: 'error', message: 'Server Error'}))
             response.end();
         }
 

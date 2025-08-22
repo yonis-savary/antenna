@@ -44,7 +44,7 @@ export default class Mediator {
                     .catch(error => {throw new Error(error)})
                 return [];
             }
-            
+
             this.logger.log("Executing " + serviceName + " (no delay)");
             return await this.launch(serviceName, service, body)
                 .catch(error => {throw new Error(error)})

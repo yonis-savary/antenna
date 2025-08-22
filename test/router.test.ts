@@ -294,5 +294,16 @@ test('should respond 200 on executed contextualized Python script', async () => 
 });
 
 
+test('should respond 500 on failed script', async () => {
+    const req = createMockReq({ method: 'POST', url: '/python-webhook-with-directory', headers: { "content-type": 'application/json' }});
+    const res = createMockRes();
+    await router.route(req, res);
+
+    assert.is(res._headers['content-type'], 'application/json')
+    assert.is(res._statusCode, 500);
+    assert.is(res._data, JSON.stringify({status: 'error', message: 'Server Error'}))
+});
+
+
 
 test.run();

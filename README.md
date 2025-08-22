@@ -79,6 +79,26 @@ webhook-that-prints-variable:
   injection_variable: MY_VARIABLE
   commands:
    - 'echo "$MY_VARIABLE"'
+
+python-webhook:
+  url: '/launch-some-script'
+  # Directory containing your script
+  directory: '/home/foo/my-script-directory'
+  injection: argv
+  injection_variable: MY_JSON_ARGV
+  commands:
+    # Will launch /home/foo/my-script-directory/handle_some_json.py --MY_JSON_ARGV=<body>
+    - 'python3 handle_some_json.py'
+
+absolute-python-webhook:
+  url: '/launch-some-script'
+  # Directory containing your target file
+  directory: '/home/foo/my-files'
+  injection: argv
+  injection_variable: MY_JSON_ARGV
+  commands:
+    # script path is absolute here
+    - 'python3 /home/foo/my-script-directory/handle_some_json.py'
 ```
 
 Tests with
