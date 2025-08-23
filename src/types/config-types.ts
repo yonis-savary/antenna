@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const ServiceSchema = z.object({
     url: z.string().startsWith('/'),
-    directory: z.string(),
+    directory: z.string().optional(),
     injection: z.enum(['none', 'pipe', 'variable', 'argv']).optional().default('none'),
     injection_variable: z.string().optional().default('ANTENNA_BODY'),
     async: z.boolean().optional().default(false),

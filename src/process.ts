@@ -40,7 +40,7 @@ export default class Process {
             processLogger.log(`> ${commandToLaunch}`);
 
             const output = await new Promise((resolve, reject) => {
-                exec(commandToLaunch, { cwd: this.service.directory }, (error, stdout, stderr) => {
+                exec(commandToLaunch, { cwd: this.service.directory ?? process.cwd() }, (error, stdout, stderr) => {
                     if (stderr) {
                         stderr.trim().split("\n").forEach(line => processLogger.error(`stderr: ${line}`));
                     }

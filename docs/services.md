@@ -9,11 +9,16 @@ Your webhooks are configured through `antenna.yml` file, here is a simple exampl
 my-service:
   # url: route to launch the webhook
   url: "/my-service"
+  # directory: Working directory for commands
+  # this is optionnal (is Antenna path by default)
+  directory: "/home/foo/my-project"
   # commands: Shell commands to execute
+  # (don't forget that yaml supports multiline strings !)
   commands:
     - "echo 'Hello!' >> output"
-  # directory: Working directory for commands
-  directory: "/home/foo/my-project"
+    - >
+      make prod &&
+      (echo "My Mail" | msmtp any@mail.com)
 ```
 
 ## Secret
@@ -89,7 +94,7 @@ webhook-that-prints:
   commands:
    - './rebuild-my-application.sh',
 ```
-7
+
 ## Injection
 
 While working with webhooks, you may want to process some kind of body, to do so, you can inject the request's body in your services
