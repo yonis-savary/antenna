@@ -66,7 +66,7 @@ curl -vX POST http://localhost:3000/my-service \
 
 Additionnally, you can configure the secret header to read with `secret_header` (`x-hub-signature-256` by default)
 
-## Rebounce
+## Debounce
 
 You can set a `delay` (in seconds) on your services, to schedule the launch of the commands, here is an example
 

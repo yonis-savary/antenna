@@ -1,13 +1,18 @@
-# Antenna
+# 📡 Antenna
 
 Basic NodeJs Webhooks server
 
-## Features
+## ⚡️ Features
 
-- Configurable routes / commands
-- SHA256 Secret support
+- Configurable services
+  - Working directory
+  - Commands to launch
+  - SHA256 Secret support
+  - Request body injection
+  - Async commands + Debounce feature
+  - And more !
 
-## Installation
+## ⬇️ Installation
 
 ```sh
 git clone https://github.com/yonis-savary/antenna.git
@@ -23,9 +28,9 @@ make build
 make prod
 ```
 
-## Configuration example
+## ⚙️ Configuration example
 
-### Application Configuration
+### Application
 
 `.env` :
 
@@ -38,7 +43,7 @@ APP_PORT=3000
 ALLOW_PING_ROUTE=true # (true by default)
 ```
 
-### Service configuration
+### Services
 
 Services can be customized with a bunch of options, to explore them, see the [Service Configuration](./docs/services.md) documentation
 
