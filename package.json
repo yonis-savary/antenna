@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsup",
-    "start": "node dist/server.js",
+    "start": "node dist/antenna.cjs",
     "test": "tsx node_modules/uvu/bin.js test"
   },
   "repository": {

@@ -64,6 +64,7 @@ export default class Router {
         {
             if (!await hasJsonBody(request, response)) {
                 response.writeHead(415);
+                response.write('Please use a POST request with json body/header');
                 response.end();
                 return;
             }

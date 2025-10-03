@@ -8,7 +8,7 @@ build:
 	@npm ci
 	@npm run build
 
-prod:
+deploy:
 	@git pull
 	@npm ci
 	@npm run build
